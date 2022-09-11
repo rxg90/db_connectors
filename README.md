@@ -7,5 +7,5 @@ Python:
 
 SQL:
 1. Use my local DB.
-2. 2. Import file using BULK INSERT command.
+2. Import file using BULK INSERT command.
 3. Clean files
