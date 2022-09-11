@@ -1,7 +1,11 @@
 # db_connectors
-Test different ways to upload any kind of structured data using Python and then clean data using SQL. 
+Test different ways to upload any kind of structured data using Python/SQL and then clean data using SQL. 
 
+Python:
+1. DB connection using pyodbc(MS SQL).
+2. Run queries using pandas.
 
-1. DB connection using Pandas and SQL Alchemy.
-2. DB connection using psycopg2.
-3. DB connection using generators.
+SQL:
+1. Use my local DB.
+2. 2. Import file using BULK INSERT command.
+3. Clean files
