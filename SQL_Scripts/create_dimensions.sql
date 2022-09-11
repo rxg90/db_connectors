@@ -5,7 +5,7 @@
 --select * from stg.nyc_airlines
 drop table if exists dbo.dim_airline;
 create table dbo.dim_airline
-(ailine_id INT IDENTITY(1,1) NOT NULL
+(airline_id INT IDENTITY(1,1) NOT NULL
 ,carrier_id varchar(2) PRIMARY KEY not null
 ,carrier_name varchar(100)
 )
@@ -80,30 +80,77 @@ cast(rtrim(ltrim(tailnum)) as varchar(6))
 from stg.nyc_planes
 
 
---select * from dbo.dim_plane
+--select top 2 * from dbo.dim_plane
+/*
+select top 2 * from stg.nyc_flights
 
---select top 10 * from stg.nyc_flights
-drop table if exists stg.nyc_flights;
-create table stg.nyc_flights
+select flight,tailnum,time_hour,count(*)
+from stg.nyc_flights
+group by flight,tailnum,time_hour
+having count(*) >1
+
+select * from stg.nyc_flights
+where flight = '11'
+and time_hour='2013-01-01T12:00:00Z'
+*/
+drop table if exists dbo.fact_flights;
+create table dbo.fact_flights
 (
-flght_id bigint
-,year bigint
-,month int
-,day int
-,actual_dep_time bigint
-,sched_dep_time bigint
-,dep_delay bigint
-,actual_arr_time bigint
-,sched_arr_time bigint
-,arr_delay bigint
-,airline_id varchar(max)
-,flight int
-,tailnum int
-,origin varchar(max)
-,dest varchar(max)
-,air_time varchar(max)
-,distance varchar(max)
-,hour varchar(max)
-,minute varchar(max)
-,time_hour varchar(max)
+flight_id int
+,recorddate datetime not null--,time_hour 
+--,year int
+--,month int
+--,day int
+,actual_dep_time int
+,sched_dep_time int
+,dep_delay int
+,actual_arr_time int
+,sched_arr_time int
+,arr_delay int
+,airline_id int
+,flight int not null
+,plane_id int not null
+,origin_airport_id int
+,dest_airport_id int
+,air_time int
+,distance int
+--,hour int
+--,minute int
+--,rec_hash binary
+--,key_hash binary
 )
+
+--drop and recreate table 
+insert into dbo.fact_flights
+select 
+cast(f.id as int)
+,cast(time_hour as datetime)
+--,cast(f.year as int)
+--,cast(month as int)
+--,cast(day as int)
+,cast(actual_dep_time as int)
+,cast(sched_dep_time as int)
+,cast(dep_delay as int)
+,cast(actual_arr_time as int)
+,cast(sched_arr_time as int)
+,cast(arr_delay as int)
+,a.airline_id
+,cast(flight as int )
+,plane_id
+,a1.airport_id
+,a2.airport_id
+,cast(air_time as int)
+,cast(distance as int)
+--,cast(hour as int)
+--,cast(minute as int)
+--,cast(rec_hash binary
+--,cast(key_hash binary
+from stg.nyc_flights f
+inner join dbo.dim_airline a
+on f.carrier = a.carrier_id
+inner join dbo.dim_plane p
+on f.tailnum = p.tailnum
+inner join dbo.dim_airport a1
+on f.origin = a1.faa
+inner join dbo.dim_airport a2
+on f.dest = a2.faa
